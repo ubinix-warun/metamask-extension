@@ -1,0 +1,43 @@
+diff --git a/node_modules/eth-json-rpc-middleware/dist/block-cache.js b/node_modules/eth-json-rpc-middleware/dist/block-cache.js
+index ebea7d1..8a66c02 100644
+--- a/node_modules/eth-json-rpc-middleware/dist/block-cache.js
++++ b/node_modules/eth-json-rpc-middleware/dist/block-cache.js
+@@ -118,6 +118,7 @@ function createBlockCacheMiddleware({ blockTracker, } = {}) {
+         if (!blockTag) {
+             blockTag = 'latest';
+         }
++        console.log('[eth-json-rpc-middleware/block-cache] blockTag:', blockTag, '/ req:', req)
+         // get exact block number
+         let requestedBlockNumber;
+         if (blockTag === 'earliest') {
+@@ -127,6 +128,7 @@ function createBlockCacheMiddleware({ blockTracker, } = {}) {
+         else if (blockTag === 'latest') {
+             // fetch latest block number
+             const latestBlockNumber = await blockTracker.getLatestBlock();
++            console.log('[eth-json-rpc-middleware/block-cache] clearing all cached data before block number:', latestBlockNumber)
+             // clear all cache before latest block
+             blockCache.clearBefore(latestBlockNumber);
+             requestedBlockNumber = latestBlockNumber;
+@@ -136,8 +138,10 @@ function createBlockCacheMiddleware({ blockTracker, } = {}) {
+             requestedBlockNumber = blockTag;
+         }
+         // end on a hit, continue on a miss
++        console.log('[eth-json-rpc-middleware/block-cache] looking up cache under block number:', requestedBlockNumber)
+         const cacheResult = await strategy.get(req, requestedBlockNumber);
+         if (cacheResult === undefined) {
++            console.log('[eth-json-rpc-middleware/block-cache] cache miss, passing through to request')
+             // cache miss
+             // wait for other middleware to handle request
+             // eslint-disable-next-line node/callback-return
+@@ -145,9 +149,11 @@ function createBlockCacheMiddleware({ blockTracker, } = {}) {
+             // add result to cache
+             // it's safe to cast res.result as Block, due to runtime type checks
+             // performed when strategy.set is called
++            console.log('[eth-json-rpc-middleware/block-cache] caching:', res.result, '/ under block number:', requestedBlockNumber)
+             await strategy.set(req, requestedBlockNumber, res.result);
+         }
+         else {
++            console.log('[eth-json-rpc-middleware/block-cache] cache hit:', cacheResult)
+             // fill in result from cache
+             res.result = cacheResult;
+         }
