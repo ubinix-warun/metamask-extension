@@ -10,6 +10,15 @@ import {
 } from '../../../store/actions';
 import { getDetectedTokensInCurrentNetwork } from '../../../selectors';
 
+import {
+  importTokens,
+  ignoreTokens,
+  setNewTokensImported,
+} from '../../../store/actions';
+import { getDetectedTokensInCurrentNetwork } from '../../../selectors';
+
+import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils';
+import { DEFAULT_ROUTE } from '../../../helpers/constants/routes';
 import DetectedTokenSelectionPopover from './detected-token-selection-popover/detected-token-selection-popover';
 import DetectedTokenIgnoredPopover from './detected-token-ignored-popover/detected-token-ignored-popover';
 
