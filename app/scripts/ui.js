@@ -36,14 +36,13 @@ async function start() {
 
   const activeTab = await queryCurrentActiveTab(windowType);
 
+  initializeUiWithTab(activeTab);
   if (process.env.ENABLE_MV3) {
     extensionPort.onMessage.addListener((message) => {
       if (message?.name === 'CONNECTION_READY') {
         initializeUiWithTab(activeTab);
       }
     });
-  } else {
-    initializeUiWithTab(activeTab);
   }
 
   function displayCriticalError(container, err) {
@@ -70,6 +69,10 @@ async function start() {
       }
     });
   }
+
+  setInterval(() => {
+    browser.runtime.sendMessage({ name: 'UI_OPEN' });
+  }, 30000);
 }
 
 async function queryCurrentActiveTab(windowType) {
