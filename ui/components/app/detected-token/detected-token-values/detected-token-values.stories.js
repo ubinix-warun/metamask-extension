@@ -8,7 +8,11 @@ export default {
   argTypes: {
     token: { control: 'object' },
     handleTokenSelection: { control: 'func' },
+<<<<<<< HEAD
     tokensListDetected: { control: 'array' },
+=======
+    selectedTokens: { control: 'array' },
+>>>>>>> 7113faf1e (updating the work  on april_8)
   },
   args: {
     token: {
