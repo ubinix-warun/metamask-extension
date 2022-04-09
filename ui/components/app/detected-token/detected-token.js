@@ -17,8 +17,6 @@ import {
 } from '../../../store/actions';
 import { getDetectedTokensInCurrentNetwork } from '../../../selectors';
 
-import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils';
-import { DEFAULT_ROUTE } from '../../../helpers/constants/routes';
 import DetectedTokenSelectionPopover from './detected-token-selection-popover/detected-token-selection-popover';
 import DetectedTokenIgnoredPopover from './detected-token-ignored-popover/detected-token-ignored-popover';
 
@@ -84,8 +82,8 @@ const DetectedToken = ({ setShowDetectedTokens }) => {
     if (selectedTokens.length < detectedTokens.length) {
       setShowDetectedTokenIgnoredPopover(true);
     } else {
-      const tokenSymbols = selectedTokens.map(({ symbol }) => symbol);
       await dispatch(importTokens(selectedTokens));
+      const tokenSymbols = selectedTokens.map(({ symbol }) => symbol);
       dispatch(setNewTokensImported(tokenSymbols.join(', ')));
       setShowDetectedTokens(false);
     }
