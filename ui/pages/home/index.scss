@@ -196,27 +196,15 @@
     &-icon {
       @include H3;
 
-<<<<<<< HEAD
       margin-inline-end: 12px;
-=======
-      margin-right: 12px;
->>>>>>> 7113faf1e (updating the work  on april_8)
       padding-top: 12px;
       color: var(--color-success-default);
     }
 
     &-close {
-<<<<<<< HEAD
       color: var(--color-icon-default);
       background: none;
       margin-inline-start: 32px;
-=======
-      @include H4;
-
-      color: var(--color-icon-default);
-      background: none;
-      margin-left: 44px;
->>>>>>> 7113faf1e (updating the work  on april_8)
     }
   }
 }
