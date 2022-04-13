@@ -11,7 +11,7 @@ import Eth from 'ethjs';
 import EthQuery from 'eth-query';
 import StreamProvider from 'web3-stream-provider';
 import log from 'loglevel';
-import launchMetaMaskUi from '../../ui';
+import launchMetaMaskUi, { updateBackgroundConnection } from '../../ui';
 import {
   ENVIRONMENT_TYPE_FULLSCREEN,
   ENVIRONMENT_TYPE_POPUP,
@@ -23,6 +23,9 @@ import metaRPCClientFactory from './lib/metaRPCClientFactory';
 
 start().catch(log.error);
 
+let isUIInitialised = false;
+let store;
+
 async function start() {
   // create platform global
   global.platform = new ExtensionPlatform();
@@ -31,18 +34,19 @@ async function start() {
   const windowType = getEnvironmentType();
 
   // setup stream to background
-  const extensionPort = browser.runtime.connect({ name: windowType });
-  const connectionStream = new PortStream(extensionPort);
+  let extensionPort = browser.runtime.connect({ name: windowType });
+  let connectionStream = new PortStream(extensionPort);
 
   const activeTab = await queryCurrentActiveTab(windowType);
 
-  initializeUiWithTab(activeTab);
   if (process.env.ENABLE_MV3) {
     extensionPort.onMessage.addListener((message) => {
       if (message?.name === 'CONNECTION_READY') {
         initializeUiWithTab(activeTab);
       }
     });
+  } else {
+    initializeUiWithTab(activeTab);
   }
 
   function displayCriticalError(container, err) {
@@ -53,20 +57,49 @@ async function start() {
     throw err;
   }
 
+  browser.runtime.onMessage.addListener((message) => {
+    if (message.name === 'APP_INIT' && isUIInitialised) {
+      extensionPort = browser.runtime.connect({ name: windowType });
+      connectionStream = new PortStream(extensionPort);
+    }
+  });
+
   function initializeUiWithTab(tab) {
     const container = document.getElementById('app-content');
-    initializeUi(tab, container, connectionStream, (err, store) => {
+    if (isUIInitialised) {
+      updateUiStreams(container);
+    } else {
+      initializeUi(tab, container, connectionStream, (err, appStore) => {
+        if (!err) {
+          isUIInitialised = true;
+        }
+        if (err) {
+          displayCriticalError(container, err);
+          return;
+        }
+        store = appStore;
+        const state = appStore.getState();
+        const { metamask: { completedOnboarding } = {} } = state;
+
+        if (
+          !completedOnboarding &&
+          windowType !== ENVIRONMENT_TYPE_FULLSCREEN
+        ) {
+          global.platform.openExtensionInBrowser();
+        }
+      });
+    }
+  }
+
+  function updateUiStreams(container) {
+    console.log('----- into updateUiStreams -----');
+    connectToAccountManager(connectionStream, (err, backgroundConnection) => {
       if (err) {
         displayCriticalError(container, err);
         return;
       }
 
-      const state = store.getState();
-      const { metamask: { completedOnboarding } = {} } = state;
-
-      if (!completedOnboarding && windowType !== ENVIRONMENT_TYPE_FULLSCREEN) {
-        global.platform.openExtensionInBrowser();
-      }
+      updateBackgroundConnection(backgroundConnection, store);
     });
   }
 

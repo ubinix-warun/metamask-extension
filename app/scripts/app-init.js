@@ -10,6 +10,9 @@ function tryImport(...fileNames) {
   }
 }
 
+// eslint-disable-next-line
+chrome.runtime.sendMessage({ name: 'APP_INIT' });
+
 let initialized = false;
 
 function importAllScripts() {
@@ -33,6 +36,9 @@ function importAllScripts() {
         (Date.now() - startImportScriptsTime) / 1000
       }`,
     );
+
+    // eslint-disable-next-line
+    chrome.runtime.sendMessage({ name: 'APP_INIT' });
     initialized = true;
   }
 }
@@ -42,7 +48,6 @@ importAllScripts();
 // eslint-disable-next-line
 chrome.runtime.onMessage.addListener((_1, _2, sendResponse) => {
   sendResponse({ name: 'SERVICE_WORKER_ACTIVATION' });
-  importAllScripts();
 });
 
 /**
