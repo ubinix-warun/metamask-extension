@@ -58,7 +58,12 @@ async function start() {
   }
 
   browser.runtime.onMessage.addListener((message) => {
-    if (message.name === 'APP_INIT' && isUIInitialised) {
+    // todo: change check below to do app init whenever port is closed
+    if (
+      message.name === 'APP_RELOAD' ||
+      (message.name === 'APP_INIT' && isUIInitialised)
+    ) {
+      console.log('---- received APP_INIT ----');
       extensionPort = browser.runtime.connect({ name: windowType });
       connectionStream = new PortStream(extensionPort);
       extensionPort.onMessage.addListener((msg) => {
@@ -111,6 +116,7 @@ async function start() {
     });
   }
 
+  browser.runtime.sendMessage({ name: 'UI_LOAD' });
   setInterval(() => {
     browser.runtime.sendMessage({ name: 'UI_OPEN' });
   }, 30000);

@@ -10,35 +10,29 @@ function tryImport(...fileNames) {
   }
 }
 
-let initialized = false;
+// eslint-disable-next-line
+chrome.runtime.sendMessage({ name: 'APP_INIT' });
 
 function importAllScripts() {
-  if (!initialized) {
-    // eslint-disable-next-line
-    chrome.runtime.sendMessage({ name: 'APP_INIT' });
+  const startImportScriptsTime = Date.now();
+  tryImport('./globalthis.js');
+  tryImport('./sentry-install.js');
+  tryImport('./runtime-lavamoat.js');
+  tryImport('./lockdown-more.js');
+  tryImport('./policy-load.js');
 
-    const startImportScriptsTime = Date.now();
-    tryImport('./globalthis.js');
-    tryImport('./sentry-install.js');
-    tryImport('./runtime-lavamoat.js');
-    tryImport('./lockdown-more.js');
-    tryImport('./policy-load.js');
+  const fileList = [
+    /** FILE NAMES */
+  ];
 
-    const fileList = [
-      /** FILE NAMES */
-    ];
+  fileList.forEach((fileName) => tryImport(fileName));
 
-    fileList.forEach((fileName) => tryImport(fileName));
-
-    // for performance metrics/reference
-    console.log(
-      `SCRIPTS IMPORT COMPLETE in Seconds: ${
-        (Date.now() - startImportScriptsTime) / 1000
-      }`,
-    );
-
-    initialized = true;
-  }
+  // for performance metrics/reference
+  console.log(
+    `SCRIPTS IMPORT COMPLETE in Seconds: ${
+      (Date.now() - startImportScriptsTime) / 1000
+    }`,
+  );
 }
 
 // eslint-disable-next-line
@@ -48,10 +42,18 @@ self.oninstall = () => {
 
 // eslint-disable-next-line
 chrome.runtime.onMessage.addListener((_1, _2, sendResponse) => {
+  // eslint-disable-next-line
+  if (!self.LavaPack) {
+    importAllScripts();
+    // eslint-disable-next-line
+    chrome.runtime.sendMessage({ name: 'APP_RELOAD' });
+  }
+
   sendResponse({ name: 'SERVICE_WORKER_ACTIVATION' });
 });
 
 // todo: remove use of chrome
+// todo: specific lint errors
 
 /**
  * An open issue is changes in this file break during hot reloading. Reason is dynamic injection of "FILE NAMES".
