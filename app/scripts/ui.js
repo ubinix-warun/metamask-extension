@@ -101,6 +101,7 @@ async function start() {
     }
   }
 
+  // todo: check if needed
   function updateUiStreams(container) {
     console.log('----- into updateUiStreams -----');
     connectToAccountManager(connectionStream, (err, backgroundConnection) => {

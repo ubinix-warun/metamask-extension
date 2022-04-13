@@ -41,12 +41,17 @@ function importAllScripts() {
   }
 }
 
-importAllScripts();
+// eslint-disable-next-line
+self.oninstall = () => {
+  importAllScripts();
+};
 
 // eslint-disable-next-line
 chrome.runtime.onMessage.addListener((_1, _2, sendResponse) => {
   sendResponse({ name: 'SERVICE_WORKER_ACTIVATION' });
 });
+
+// todo: remove use of chrome
 
 /**
  * An open issue is changes in this file break during hot reloading. Reason is dynamic injection of "FILE NAMES".
