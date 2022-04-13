@@ -42,7 +42,6 @@ async function start() {
   if (process.env.ENABLE_MV3) {
     extensionPort.onMessage.addListener((message) => {
       if (message?.name === 'CONNECTION_READY') {
-        console.log('into CONNECTION_READY');
         initializeUiWithTab(activeTab);
       }
     });
@@ -60,7 +59,6 @@ async function start() {
 
   browser.runtime.onMessage.addListener((message) => {
     if (message.name === 'APP_INIT' && isUIInitialised) {
-      console.log('----- into APP_INIT IF -----');
       extensionPort = browser.runtime.connect({ name: windowType });
       connectionStream = new PortStream(extensionPort);
       extensionPort.onMessage.addListener((msg) => {
@@ -74,7 +72,6 @@ async function start() {
   });
 
   function initializeUiWithTab(tab) {
-    console.log('----- into initializeUiWithTab -----');
     const container = document.getElementById('app-content');
     if (isUIInitialised) {
       updateUiStreams(container);

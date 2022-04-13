@@ -90,7 +90,6 @@ if (process.env.ENABLE_MV3) {
     initialLangCode = await getFirstPreferredLangCode();
   })();
 } else {
-  console.log('-- 2 --');
   initialize().catch(log.error);
 }
 
@@ -322,7 +321,6 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
   }
 
   if (process.env.ENABLE_MV3 && remoteSourcePort) {
-    console.log('remoteSourcePort = ', remoteSourcePort);
     connectRemote(remoteSourcePort);
   }
 
@@ -390,11 +388,6 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
         remotePort.sender.origin === `chrome-extension://${browser.runtime.id}`;
     }
 
-    console.log(
-      '----- remotePort -----',
-      remotePort,
-      isMetaMaskInternalProcess,
-    );
     if (isMetaMaskInternalProcess) {
       const portStream = new PortStream(remotePort);
       // communication with popup
