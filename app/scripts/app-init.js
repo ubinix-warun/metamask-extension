@@ -10,13 +10,13 @@ function tryImport(...fileNames) {
   }
 }
 
-// eslint-disable-next-line
-chrome.runtime.sendMessage({ name: 'APP_INIT' });
-
 let initialized = false;
 
 function importAllScripts() {
   if (!initialized) {
+    // eslint-disable-next-line
+    chrome.runtime.sendMessage({ name: 'APP_INIT' });
+
     const startImportScriptsTime = Date.now();
     tryImport('./globalthis.js');
     tryImport('./sentry-install.js');
@@ -37,8 +37,6 @@ function importAllScripts() {
       }`,
     );
 
-    // eslint-disable-next-line
-    chrome.runtime.sendMessage({ name: 'APP_INIT' });
     initialized = true;
   }
 }

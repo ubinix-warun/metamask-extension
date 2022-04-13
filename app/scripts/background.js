@@ -78,6 +78,7 @@ if (inTest || process.env.METAMASK_DEBUG) {
 let initialState;
 let initialLangCode;
 const initApp = (remotePort) => {
+  console.log('-- 1 --');
   browser.runtime.onConnect.removeListener(initApp);
   initialize(remotePort).catch(log.error);
 };
@@ -89,6 +90,7 @@ if (process.env.ENABLE_MV3) {
     initialLangCode = await getFirstPreferredLangCode();
   })();
 } else {
+  console.log('-- 2 --');
   initialize().catch(log.error);
 }
 
@@ -320,15 +322,14 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
   }
 
   if (process.env.ENABLE_MV3 && remoteSourcePort) {
+    console.log('remoteSourcePort = ', remoteSourcePort);
     connectRemote(remoteSourcePort);
   }
 
   //
   // connect to other contexts
   //
-  browser.runtime.onConnect.addListener((port) => {
-    connectRemote(port);
-  });
+  browser.runtime.onConnect.addListener(connectRemote);
 
   browser.runtime.onConnectExternal.addListener(connectExternal);
 
@@ -389,6 +390,11 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
         remotePort.sender.origin === `chrome-extension://${browser.runtime.id}`;
     }
 
+    console.log(
+      '----- remotePort -----',
+      remotePort,
+      isMetaMaskInternalProcess,
+    );
     if (isMetaMaskInternalProcess) {
       const portStream = new PortStream(remotePort);
       // communication with popup
