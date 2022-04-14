@@ -10,9 +10,6 @@ function tryImport(...fileNames) {
   }
 }
 
-// eslint-disable-next-line
-chrome.runtime.sendMessage({ name: 'APP_INIT' });
-
 function importAllScripts() {
   const startImportScriptsTime = Date.now();
   tryImport('./globalthis.js');
@@ -41,12 +38,14 @@ self.oninstall = () => {
 };
 
 // eslint-disable-next-line
-chrome.runtime.onMessage.addListener((_1, _2, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg, _2, sendResponse) => {
+  // we should not  need to wait 30 seconds for re-activation
+  // check for stream close event to send this message
   // eslint-disable-next-line
   if (!self.LavaPack) {
     importAllScripts();
     // eslint-disable-next-line
-    chrome.runtime.sendMessage({ name: 'APP_RELOAD' });
+    chrome.runtime.sendMessage({ name: 'APP_INIT' });
   }
 
   sendResponse({ name: 'SERVICE_WORKER_ACTIVATION' });

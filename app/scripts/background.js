@@ -372,6 +372,7 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
    * @param {Port} remotePort - The port provided by a new context.
    */
   function connectRemote(remotePort) {
+    console.log('-- connectRemote --');
     const processName = remotePort.name;
 
     if (metamaskBlockedPorts.includes(remotePort.name)) {
@@ -389,6 +390,7 @@ async function setupController(initState, initLangCode, remoteSourcePort) {
     }
 
     if (isMetaMaskInternalProcess) {
+      console.log('-- isMetaMaskInternalProcess --');
       const portStream = new PortStream(remotePort);
       // communication with popup
       controller.isClientOpen = true;

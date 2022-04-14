@@ -39,12 +39,21 @@ async function start() {
 
   const activeTab = await queryCurrentActiveTab(windowType);
 
+  const listener = (message) => {
+    if (message?.name === 'CONNECTION_READY') {
+      initializeUiWithTab(activeTab);
+    }
+  };
+
   if (process.env.ENABLE_MV3) {
-    extensionPort.onMessage.addListener((message) => {
-      if (message?.name === 'CONNECTION_READY') {
-        initializeUiWithTab(activeTab);
-      }
-    });
+    extensionPort.onMessage.addListener(listener);
+    const list1 = () => {
+      // todo: also instantly send connect request here
+      extensionPort.onMessage.removeListener(listener);
+      extensionPort.onDisconnect.removeListener(list1);
+      browser.runtime.sendMessage({ name: 'APP_RELOAD' });
+    };
+    extensionPort.onDisconnect.addListener(list1);
   } else {
     initializeUiWithTab(activeTab);
   }
@@ -59,19 +68,18 @@ async function start() {
 
   browser.runtime.onMessage.addListener((message) => {
     // todo: change check below to do app init whenever port is closed
-    if (
-      message.name === 'APP_RELOAD' ||
-      (message.name === 'APP_INIT' && isUIInitialised)
-    ) {
+    console.log(extensionPort, connectionStream);
+    if (message.name === 'APP_INIT') {
       console.log('---- received APP_INIT ----');
       extensionPort = browser.runtime.connect({ name: windowType });
       connectionStream = new PortStream(extensionPort);
-      extensionPort.onMessage.addListener((msg) => {
-        if (msg?.name === 'CONNECTION_READY') {
-          console.log('into CONNECTION_READY');
-          initializeUiWithTab(activeTab);
-        }
-      });
+      extensionPort.onMessage.addListener(listener);
+      const list1 = () => {
+        extensionPort.onMessage.removeListener(listener);
+        extensionPort.onDisconnect.removeListener(list1);
+        browser.runtime.sendMessage({ name: 'APP_RELOAD' });
+      };
+      extensionPort.onDisconnect.addListener(list1);
     }
     return true;
   });
@@ -116,7 +124,7 @@ async function start() {
     });
   }
 
-  browser.runtime.sendMessage({ name: 'UI_LOAD' });
+  browser.runtime.sendMessage({ name: 'APP_RELOAD' });
   setInterval(() => {
     browser.runtime.sendMessage({ name: 'UI_OPEN' });
   }, 30000);
