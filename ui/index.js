@@ -34,7 +34,9 @@ export default function launchMetamaskUi(opts, cb) {
   const { backgroundConnection } = opts;
   actions._setBackgroundConnection(backgroundConnection);
   // check if we are unlocked first
+  console.log('--- going to get state ----');
   backgroundConnection.getState(function (err, metamaskState) {
+    console.log('--- backgroundConnection ----', metamaskState);
     if (err) {
       cb(err);
       return;

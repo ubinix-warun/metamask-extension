@@ -36,15 +36,7 @@ async function start() {
 
   const activeTab = await queryCurrentActiveTab(windowType);
 
-  if (process.env.ENABLE_MV3) {
-    extensionPort.onMessage.addListener((message) => {
-      if (message?.name === 'CONNECTION_READY') {
-        initializeUiWithTab(activeTab);
-      }
-    });
-  } else {
-    initializeUiWithTab(activeTab);
-  }
+  initializeUiWithTab(activeTab);
 
   function displayCriticalError(container, err) {
     container.innerHTML =

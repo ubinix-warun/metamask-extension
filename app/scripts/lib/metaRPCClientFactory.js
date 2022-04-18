@@ -69,10 +69,13 @@ class MetaRPCClient {
 }
 
 const metaRPCClientFactory = (connectionStream) => {
+  console.log(' creatin metaRPCClientFactory');
   const metaRPCClient = new MetaRPCClient(connectionStream);
   return new Proxy(metaRPCClient, {
     get: (object, property) => {
+      console.log('---- into get state ----');
       if (object[property]) {
+        console.log('---- into get state success ----');
         return object[property];
       }
       return (...p) => {
