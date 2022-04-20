@@ -82,8 +82,8 @@ const DetectedToken = ({ setShowDetectedTokens }) => {
     if (selectedTokens.length < detectedTokens.length) {
       setShowDetectedTokenIgnoredPopover(true);
     } else {
-      const tokenSymbols = selectedTokensList.map(({ symbol }) => symbol);
-      await dispatch(importTokens(selectedTokensList));
+      const tokenSymbols = selectedTokens.map(({ symbol }) => symbol);
+      await dispatch(importTokens(selectedTokens));
       dispatch(setNewTokensImported(tokenSymbols.join(', ')));
       setShowDetectedTokens(false);
     }
