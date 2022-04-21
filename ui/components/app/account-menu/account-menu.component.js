@@ -397,8 +397,8 @@ export default class AccountMenu extends Component {
             <Box>
               <div
                 className="account-menu__refresh-button"
-                onClick={async () => {
-                  await autoDetectAccounts();
+                onClick={() => {
+                  autoDetectAccounts();
                 }}
               >
                 {t('refreshAccounts')}
