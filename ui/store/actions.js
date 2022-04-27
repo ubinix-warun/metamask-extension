@@ -1974,7 +1974,12 @@ export function delRpcTarget(oldRpc) {
 }
 
 // Calls the addressBookController to add a new address.
-export function addToAddressBook(recipient, nickname = '', memo = '') {
+export function addToAddressBook(
+  recipient,
+  nickname = '',
+  memo = '',
+  addressType,
+) {
   log.debug(`background.addToAddressBook`);
 
   return async (dispatch, getState) => {
@@ -1987,6 +1992,7 @@ export function addToAddressBook(recipient, nickname = '', memo = '') {
         nickname,
         chainId,
         memo,
+        addressType,
       );
     } catch (error) {
       log.error(error);
