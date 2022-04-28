@@ -4,9 +4,12 @@
 // run any task with "yarn build ${taskName}"
 //
 const path = require('path');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const livereload = require('gulp-livereload');
 const minimist = require('minimist');
 const { sync: globby } = require('globby');
+
 const { getVersion } = require('../lib/get-version');
 const { BuildType } = require('../lib/build-type');
 const {
@@ -53,195 +56,198 @@ require('eslint-plugin-react');
 require('eslint-plugin-react-hooks');
 require('eslint-plugin-jest');
 
-defineAndRunBuildTasks();
+// defineAndRunBuildTasks();
 
-function defineAndRunBuildTasks() {
-  const {
-    buildType,
-    entryTask,
-    isLavaMoat,
-    policyOnly,
-    shouldIncludeLockdown,
-    shouldLintFenceFiles,
-    skipStats,
-    version,
-  } = parseArgv();
+// function defineAndRunBuildTasks() {
+//   const {
+//     buildType,
+//     entryTask,
+//     isLavaMoat,
+//     policyOnly,
+//     shouldIncludeLockdown,
+//     shouldLintFenceFiles,
+//     skipStats,
+//     version,
+//   } = parseArgv();
 
-  const browserPlatforms = ['firefox', 'chrome', 'brave', 'opera'];
+//   console.log({ entryTask });
+//   process.exit();
 
-  const browserVersionMap = getBrowserVersionMap(browserPlatforms, version);
+//   const browserPlatforms = ['firefox', 'chrome', 'brave', 'opera'];
 
-  const ignoredFiles = getIgnoredFiles(buildType);
+//   const browserVersionMap = getBrowserVersionMap(browserPlatforms, version);
 
-  const staticTasks = createStaticAssetTasks({
-    livereload,
-    browserPlatforms,
-    shouldIncludeLockdown,
-    buildType,
-  });
+//   const ignoredFiles = getIgnoredFiles(buildType);
 
-  const manifestTasks = createManifestTasks({
-    browserPlatforms,
-    browserVersionMap,
-    buildType,
-  });
+//   const staticTasks = createStaticAssetTasks({
+//     livereload,
+//     browserPlatforms,
+//     shouldIncludeLockdown,
+//     buildType,
+//   });
 
-  const styleTasks = createStyleTasks({ livereload });
+//   const manifestTasks = createManifestTasks({
+//     browserPlatforms,
+//     browserVersionMap,
+//     buildType,
+//   });
 
-  const scriptTasks = createScriptTasks({
-    browserPlatforms,
-    buildType,
-    ignoredFiles,
-    isLavaMoat,
-    livereload,
-    policyOnly,
-    shouldLintFenceFiles,
-    version,
-  });
+//   const styleTasks = createStyleTasks({ livereload });
 
-  const { clean, reload, zip } = createEtcTasks({
-    livereload,
-    browserPlatforms,
-    buildType,
-    version,
-  });
+//   const scriptTasks = createScriptTasks({
+//     browserPlatforms,
+//     buildType,
+//     ignoredFiles,
+//     isLavaMoat,
+//     livereload,
+//     policyOnly,
+//     shouldLintFenceFiles,
+//     version,
+//   });
 
-  // build for development (livereload)
-  createTask(
-    'dev',
-    composeSeries(
-      clean,
-      styleTasks.dev,
-      composeParallel(
-        scriptTasks.dev,
-        staticTasks.dev,
-        manifestTasks.dev,
-        reload,
-      ),
-    ),
-  );
+//   const { clean, reload, zip } = createEtcTasks({
+//     livereload,
+//     browserPlatforms,
+//     buildType,
+//     version,
+//   });
 
-  // build for test development (livereload)
-  createTask(
-    'testDev',
-    composeSeries(
-      clean,
-      styleTasks.dev,
-      composeParallel(
-        scriptTasks.testDev,
-        staticTasks.dev,
-        manifestTasks.testDev,
-        reload,
-      ),
-    ),
-  );
+//   // build for development (livereload)
+//   createTask(
+//     'dev',
+//     composeSeries(
+//       clean,
+//       styleTasks.dev,
+//       composeParallel(
+//         scriptTasks.dev,
+//         staticTasks.dev,
+//         manifestTasks.dev,
+//         reload,
+//       ),
+//     ),
+//   );
 
-  // build for prod release
-  createTask(
-    'prod',
-    composeSeries(
-      clean,
-      styleTasks.prod,
-      composeParallel(scriptTasks.prod, staticTasks.prod, manifestTasks.prod),
-      zip,
-    ),
-  );
+//   // build for test development (livereload)
+//   createTask(
+//     'testDev',
+//     composeSeries(
+//       clean,
+//       styleTasks.dev,
+//       composeParallel(
+//         scriptTasks.testDev,
+//         staticTasks.dev,
+//         manifestTasks.testDev,
+//         reload,
+//       ),
+//     ),
+//   );
 
-  // build just production scripts, for LavaMoat policy generation purposes
-  createTask('scripts:prod', scriptTasks.prod);
+//   // build for prod release
+//   createTask(
+//     'prod',
+//     composeSeries(
+//       clean,
+//       styleTasks.prod,
+//       composeParallel(scriptTasks.prod, staticTasks.prod, manifestTasks.prod),
+//       zip,
+//     ),
+//   );
 
-  // build for CI testing
-  createTask(
-    'test',
-    composeSeries(
-      clean,
-      styleTasks.prod,
-      composeParallel(scriptTasks.test, staticTasks.prod, manifestTasks.test),
-      zip,
-    ),
-  );
+//   // build just production scripts, for LavaMoat policy generation purposes
+//   createTask('scripts:prod', scriptTasks.prod);
 
-  // special build for minimal CI testing
-  createTask('styles', styleTasks.prod);
+//   // build for CI testing
+//   createTask(
+//     'test',
+//     composeSeries(
+//       clean,
+//       styleTasks.prod,
+//       composeParallel(scriptTasks.test, staticTasks.prod, manifestTasks.test),
+//       zip,
+//     ),
+//   );
 
-  // Finally, start the build process by running the entry task.
-  runTask(entryTask, { skipStats });
-}
+//   // special build for minimal CI testing
+//   createTask('styles', styleTasks.prod);
 
-function parseArgv() {
-  const NamedArgs = {
-    BuildType: 'build-type',
-    BuildVersion: 'build-version',
-    LintFenceFiles: 'lint-fence-files',
-    Lockdown: 'lockdown',
-    PolicyOnly: 'policy-only',
-    SkipStats: 'skip-stats',
-  };
+//   // Finally, start the build process by running the entry task.
+//   runTask(entryTask, { skipStats });
+// }
 
-  const argv = minimist(process.argv.slice(2), {
-    boolean: [
-      NamedArgs.LintFenceFiles,
-      NamedArgs.Lockdown,
-      NamedArgs.PolicyOnly,
-      NamedArgs.SkipStats,
-    ],
-    string: [NamedArgs.BuildType, NamedArgs.BuildVersion],
-    default: {
-      [NamedArgs.BuildType]: BuildType.main,
-      [NamedArgs.BuildVersion]: '0',
-      [NamedArgs.LintFenceFiles]: true,
-      [NamedArgs.Lockdown]: true,
-      [NamedArgs.PolicyOnly]: false,
-      [NamedArgs.SkipStats]: false,
-    },
-  });
+// function parseArgv() {
+//   const NamedArgs = {
+//     BuildType: 'build-type',
+//     BuildVersion: 'build-version',
+//     LintFenceFiles: 'lint-fence-files',
+//     Lockdown: 'lockdown',
+//     PolicyOnly: 'policy-only',
+//     SkipStats: 'skip-stats',
+//   };
 
-  if (argv._.length !== 1) {
-    throw new Error(
-      `Metamask build: Expected a single positional argument, but received "${argv._.length}" arguments.`,
-    );
-  }
+//   const argv = minimist(process.argv.slice(2), {
+//     boolean: [
+//       NamedArgs.LintFenceFiles,
+//       NamedArgs.Lockdown,
+//       NamedArgs.PolicyOnly,
+//       NamedArgs.SkipStats,
+//     ],
+//     string: [NamedArgs.BuildType, NamedArgs.BuildVersion],
+//     default: {
+//       [NamedArgs.BuildType]: BuildType.main,
+//       [NamedArgs.BuildVersion]: '0',
+//       [NamedArgs.LintFenceFiles]: true,
+//       [NamedArgs.Lockdown]: true,
+//       [NamedArgs.PolicyOnly]: false,
+//       [NamedArgs.SkipStats]: false,
+//     },
+//   });
 
-  const entryTask = argv._[0];
-  if (!entryTask) {
-    throw new Error('MetaMask build: No entry task specified.');
-  }
+//   if (argv._.length !== 1) {
+//     throw new Error(
+//       `Metamask build: Expected a single positional argument, but received "${argv._.length}" arguments.`,
+//     );
+//   }
 
-  const buildType = argv[NamedArgs.BuildType];
-  if (!(buildType in BuildType)) {
-    throw new Error(`MetaMask build: Invalid build type: "${buildType}"`);
-  }
+//   const entryTask = argv._[0];
+//   if (!entryTask) {
+//     throw new Error('MetaMask build: No entry task specified.');
+//   }
 
-  const rawBuildVersion = argv[NamedArgs.BuildVersion];
-  const buildVersion = Number.parseInt(rawBuildVersion, 10);
-  if (rawBuildVersion.match(/^\d+$/u) === null || Number.isNaN(buildVersion)) {
-    throw new Error(
-      `MetaMask build: Invalid build version: "${rawBuildVersion}"`,
-    );
-  }
+//   const buildType = argv[NamedArgs.BuildType];
+//   if (!(buildType in BuildType)) {
+//     throw new Error(`MetaMask build: Invalid build type: "${buildType}"`);
+//   }
 
-  // Manually default this to `false` for dev builds only.
-  const shouldLintFenceFiles = process.argv.includes(
-    `--${NamedArgs.LintFenceFiles}`,
-  )
-    ? argv[NamedArgs.LintFenceFiles]
-    : !/dev/iu.test(entryTask);
+//   const rawBuildVersion = argv[NamedArgs.BuildVersion];
+//   const buildVersion = Number.parseInt(rawBuildVersion, 10);
+//   if (rawBuildVersion.match(/^\d+$/u) === null || Number.isNaN(buildVersion)) {
+//     throw new Error(
+//       `MetaMask build: Invalid build version: "${rawBuildVersion}"`,
+//     );
+//   }
 
-  const policyOnly = argv[NamedArgs.PolicyOnly];
+//   // Manually default this to `false` for dev builds only.
+//   const shouldLintFenceFiles = process.argv.includes(
+//     `--${NamedArgs.LintFenceFiles}`,
+//   )
+//     ? argv[NamedArgs.LintFenceFiles]
+//     : !/dev/iu.test(entryTask);
 
-  const version = getVersion(buildType, buildVersion);
+//   const policyOnly = argv[NamedArgs.PolicyOnly];
 
-  return {
-    buildType,
-    entryTask,
-    isLavaMoat: process.argv[0].includes('lavamoat'),
-    policyOnly,
-    shouldIncludeLockdown: argv[NamedArgs.Lockdown],
-    shouldLintFenceFiles,
-    skipStats: argv[NamedArgs.SkipStats],
-    version,
-  };
-}
+//   const version = getVersion(buildType, buildVersion);
+
+//   return {
+//     buildType,
+//     entryTask,
+//     isLavaMoat: process.argv[0].includes('lavamoat'),
+//     policyOnly,
+//     shouldIncludeLockdown: argv[NamedArgs.Lockdown],
+//     shouldLintFenceFiles,
+//     skipStats: argv[NamedArgs.SkipStats],
+//     version,
+//   };
+// }
 
 /**
  * Gets the files to be ignored by the current build, if any.
@@ -274,3 +280,75 @@ function getIgnoredFiles(currentBuildType) {
 
   return globby(excludedFiles);
 }
+
+const buildType = 'main';
+const shouldIncludeLockdown = true;
+const isLavaMoat = false;
+const policyOnly = true;
+const shouldLintFenceFiles = true;
+const version = getVersion(buildType);
+
+const browserPlatforms = ['firefox', 'chrome', 'brave', 'opera'];
+
+const browserVersionMap = getBrowserVersionMap(browserPlatforms, version);
+
+const ignoredFiles = getIgnoredFiles(buildType);
+
+const staticTasks = createStaticAssetTasks({
+  livereload,
+  browserPlatforms,
+  shouldIncludeLockdown,
+  buildType,
+});
+
+const manifestTasks = createManifestTasks({
+  browserPlatforms,
+  browserVersionMap,
+  buildType,
+});
+
+const styleTasks = createStyleTasks({ livereload });
+
+const scriptTasks = createScriptTasks({
+  browserPlatforms,
+  buildType,
+  ignoredFiles,
+  isLavaMoat,
+  livereload,
+  policyOnly,
+  shouldLintFenceFiles,
+  version,
+});
+
+const { clean, reload, zip } = createEtcTasks({
+  livereload,
+  browserPlatforms,
+  buildType,
+  version,
+});
+
+const DEV = 'dev';
+yargs(hideBin(process.argv))
+  .command(
+    DEV,
+    'start the development server',
+    (_yargs) => ({}),
+    (_) => {
+      createTask(
+        DEV,
+        composeSeries(
+          clean,
+          styleTasks.dev,
+          composeParallel(
+            scriptTasks.dev,
+            staticTasks.dev,
+            manifestTasks.dev,
+            reload,
+          ),
+        ),
+      );
+    },
+  )
+  .parse();
+
+runTask(DEV);
