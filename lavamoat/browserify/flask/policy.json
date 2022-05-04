@@ -666,12 +666,47 @@
         "geckodriver>got>is-plain-obj": true
       }
     },
-    "3box>ipfs>ipfs-unixfs": {
+    "@metamask/bip39": {
+      "packages": {
+        "buffer": true,
+        "create-hash": true,
+        "pbkdf2": true,
+        "randombytes": true
+      }
+    },
+    "@metamask/controllers": {
+      "globals": {
+        "Headers": true,
+        "URL": true,
+        "clearInterval": true,
+        "clearTimeout": true,
+        "console.error": true,
+        "console.log": true,
+        "fetch": true,
+        "setInterval": true,
+        "setTimeout": true
+      },
       "packages": {
         "3box>ipfs>protons": true
       }
     },
-    "3box>ipfs>ipfs-unixfs-exporter": {
+    "@metamask/eth-hd-keyring": {
+      "packages": {
+        "@metamask/bip39": true,
+        "@metamask/eth-sig-util": true,
+        "buffer": true,
+        "eth-simple-keyring": true,
+        "ethereumjs-wallet": true
+      }
+    },
+    "@metamask/eth-ledger-bridge-keyring": {
+      "globals": {
+        "addEventListener": true,
+        "console.log": true,
+        "document.createElement": true,
+        "document.head.appendChild": true,
+        "fetch": true
+      },
       "packages": {
         "3box>ipfs>cids": true,
         "3box>ipfs>err-code": true,
@@ -1392,10 +1427,7 @@
         "pump>once": true
       }
     },
-    "3box>ipfs>libp2p-websocket-star-multi>libp2p-websocket-star": {
-      "globals": {
-        "console.error": true
-      },
+    "bip39": {
       "packages": {
         "3box>ipfs>async": true,
         "3box>ipfs>class-is": true,
@@ -2202,7 +2234,10 @@
     },
     "@babel/runtime": {
       "packages": {
-        "addons-linter>regenerator-runtime": true
+        "bip39": true,
+        "eth-sig-util": true,
+        "eth-simple-keyring": true,
+        "ethereumjs-wallet": true
       }
     },
     "@download/blockies": {
@@ -2241,8 +2276,17 @@
     },
     "@ensdomains/content-hash>cids>multicodec": {
       "packages": {
-        "@ensdomains/content-hash>cids>multicodec>varint": true,
-        "@ensdomains/content-hash>cids>uint8arrays": true
+        "@metamask/eth-hd-keyring": true,
+        "bip39": true,
+        "browser-passworder": true,
+        "buffer": true,
+        "eth-hd-keyring": true,
+        "eth-sig-util": true,
+        "eth-simple-keyring": true,
+        "ethereumjs-util": true,
+        "events": true,
+        "loglevel": true,
+        "obs-store": true
       }
     },
     "@ensdomains/content-hash>cids>multihashes": {
