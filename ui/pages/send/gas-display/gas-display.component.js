@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { PRIMARY, SECONDARY } from '../../../helpers/constants/common';
 
-import { addHexes } from '../../../helpers/utils/conversions.util';
+import {
+  addHexes,
+  hexWEIToDecGWEI,
+} from '../../../helpers/utils/conversions.util';
 import UserPreferencedCurrencyDisplay from '../../../components/app/user-preferenced-currency-display/user-preferenced-currency-display.component';
 import GasTiming from '../../../components/app/gas-timing/gas-timing.component';
 import InfoTooltip from '../../../components/ui/info-tooltip/info-tooltip';
@@ -10,7 +13,7 @@ import Typography from '../../../components/ui/typography/typography';
 import Button from '../../../components/ui/button';
 import { TYPOGRAPHY } from '../../../helpers/constants/design-system';
 import LoadingHeartBeat from '../../../components/ui/loading-heartbeat';
-import { hexWEIToDecGWEI } from '../../../helpers/utils/conversions.util';
+
 import TransactionDetailItem from '../../../components/app/transaction-detail-item/transaction-detail-item.component';
 import { NETWORK_TO_NAME_MAP } from '../../../../shared/constants/network';
 import TransactionDetail from '../../../components/app/transaction-detail/transaction-detail.component';
@@ -308,7 +311,7 @@ export default class GasDisplay extends Component {
                         type="inline"
                         className="gas-display__link"
                         onClick={showAccountDetails}
-                        key={'receive-button'}
+                        key="receive-button"
                       >
                         {t('receive')}
                       </Button>,
@@ -323,7 +326,7 @@ export default class GasDisplay extends Component {
                         type="inline"
                         className="gas-display__link"
                         onClick={showAccountDetails}
-                        key={'receive-button'}
+                        key="receive-button"
                       >
                         {t('receive')}
                       </Button>,
