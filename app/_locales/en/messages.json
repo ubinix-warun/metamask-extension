@@ -1619,6 +1619,10 @@
     "message": "Make sure to disable your regular MetaMask extension when using Flask.",
     "description": "This message calls to pay attention about multiple versions of MetaMask running on the same site (Flask + Prod)"
   },
+  "flaskWelcomeWarning5": {
+    "message": "POC: [WIP] Snaps UI V2 #1465",
+    "description": "Show custom ui v2 (Flask + Prod)"
+  },
   "flaskWelcomeWarningAcceptButton": {
     "message": "I accept the risks",
     "description": "this text is shown on a button, which the user presses to confirm they understand the risks of using Flask"

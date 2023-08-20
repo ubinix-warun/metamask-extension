@@ -58,12 +58,12 @@ MMMMMMMMMMMMMMMMMm/....../mMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMmmmmmmmmMMMMMMMMMMMMMMMMMM`);
 
 /* eslint-disable no-irregular-whitespace */
-const EXPERIMENTAL_AREA = lineBreaksToBr(`█▀▀ ▄▀█ █░█ ▀█▀ █ █▀█ █▄░█ ▀  
-  █▄▄ █▀█ █▄█ ░█░ █ █▄█ █░▀█ ▄  
-  
-  █▀▀ ▀▄▀ █▀█ █▀▀ █▀█ █ █▀▄▀█ █▀▀ █▄░█ ▀█▀ ▄▀█ █░░  
-  ██▄ █░█ █▀▀ ██▄ █▀▄ █ █░▀░█ ██▄ █░▀█ ░█░ █▀█ █▄▄  
-  
+const EXPERIMENTAL_AREA = lineBreaksToBr(`█▀▀ ▄▀█ █░█ ▀█▀ █ █▀█ █▄░█ ▀ 
+  █▄▄ █▀█ █▄█ ░█░ █ █▄█ █░▀█ ▄ 
+
+  █▀▀ ▀▄▀ █▀█ █▀▀ █▀█ █ █▀▄▀█ █▀▀ █▄░█ ▀█▀ ▄▀█ █░░ 
+  ██▄ █░█ █▀▀ ██▄ █▀▄ █ █░▀░█ ██▄ █░▀█ ░█░ █▀█ █▄▄ 
+
   █▀ █▀█ █▀▀ ▀█▀ █░█░█ ▄▀█ █▀█ █▀▀
   ▄█ █▄█ █▀░ ░█░ ▀▄▀▄▀ █▀█ █▀▄ ██▄`);
 /* eslint-enable no-irregular-whitespace */
@@ -86,6 +86,8 @@ export default function ExperimentalArea({ redirectTo }) {
             <b key="doNotUse">{t('flaskWelcomeUninstall')}</b>,
           ])}
         </p>
+        <br />
+        <p>{t('flaskWelcomeWarning5')} <u>&gt;&gt;<a href='https://github.com/MetaMask/snaps/pull/1465' target="_blank" >Link</a></u></p>
         <br />
         <p>{t('flaskWelcomeWarning2')}</p>
         <br />

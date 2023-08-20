@@ -71,6 +71,27 @@ export const UI_MAPPING = {
       text: props.value,
     },
   }),
+  form: (props) => ({
+    element: 'SnapUIMarkdown',
+    children: props.value,
+    props: {
+      markdown: props.markdown,
+    },
+  }),
+  button: (props) => ({
+    element: 'SnapUIMarkdown',
+    children: props.value,
+    props: {
+      markdown: props.markdown,
+    },
+  }),
+  input: (props) => ({
+    element: 'SnapUIMarkdown',
+    children: props.value,
+    props: {
+      markdown: props.markdown,
+    },
+  }),
 };
 
 // TODO: Stop exporting this when we remove the mapToTemplate hack in confirmation templates.
